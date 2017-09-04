@@ -3,14 +3,14 @@ package com.bloomberg.mktdata.samples;
 public class Security {
 
 	private String name;
-	private SubscriptionFields subscriptionFields;
+	private Securities securities;
 	
-	Security(SubscriptionFields subscriptionFields) {
-		this.subscriptionFields = subscriptionFields;
+	Security(Securities securities) {
+		this.securities = securities;
 	}
 
-	Security(SubscriptionFields subscriptionFields, String name) {
-		this.subscriptionFields = subscriptionFields;
+	Security(Securities securities, String name) {
+		this.securities = securities;
 		this.name = name;
 	}
 	
@@ -18,7 +18,7 @@ public class Security {
 		return this.name;
 	}
 	
-	public SubscriptionFields getSubscriptionFields() {
-		return this.subscriptionFields;
+	public Securities getSecurities() {
+		return this.securities;
 	}
 }

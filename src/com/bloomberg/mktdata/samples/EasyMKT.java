@@ -103,6 +103,11 @@ public class EasyMKT {
 		return fields.createSubscriptionField(fieldName);
 	}
 	
+	public Security addSecurity(String ticker) {
+		
+		return securities.createSecurity(ticker);
+	}
+
 	class EMSXEventHandler implements EventHandler
     {
 		EasyMKT easyMKT;

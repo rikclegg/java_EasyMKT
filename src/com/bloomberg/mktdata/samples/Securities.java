@@ -14,30 +14,29 @@ public class Securities implements Iterable<Security> {
 	}
 	
 	private void updateSubscriptions() {
-		// When a field is added, we cancel the existing subscriptions and re-subscribe to add the new field.
-		// Ideally, there should be no subscriptions until all the fields have been added.
+		// When a security is added, we create a new subscription for the current list of Subscription Fields.
 	}
 
 	@Override
-	public Iterator<SubscriptionField> iterator() {
-		return subscriptionFields.iterator();
+	public Iterator<Security> iterator() {
+		return securities.iterator();
 	}
 
-	public SubscriptionField get(int index) {
-		return subscriptionFields.get(index);
+	public Security get(int index) {
+		return securities.get(index);
 	}
 	
-	public SubscriptionField get(String name) {
-		for(SubscriptionField sf: subscriptionFields) {
-			if(sf.getName().equals(name)) return sf;
+	public Security get(String name) {
+		for(Security s: securities) {
+			if(s.getName().equals(name)) return s;
 		}
 		return null;
 	}
 
-	SubscriptionField createSubscriptionField(String fieldName) {
-		SubscriptionField newField = new SubscriptionField(this,fieldName);
-		subscriptionFields.add(newField);
-		return newField;
+	Security createSecurity(String ticker) {
+		Security newSecurity = new Security(this,ticker);
+		securities.add(newSecurity);
+		return newSecurity;
 	}
 
 }
