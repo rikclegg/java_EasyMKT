@@ -12,6 +12,7 @@ public class Notification {
 	public enum NotificationType { 
 		NEW,
 		UPDATE,
+		FIELD,
 		ERROR
 	}
 

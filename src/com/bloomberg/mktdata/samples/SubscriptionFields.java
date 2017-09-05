@@ -3,6 +3,8 @@ package com.bloomberg.mktdata.samples;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import com.bloomberg.mktdata.samples.Log.LogLevels;
+
 public class SubscriptionFields implements Iterable<SubscriptionField> {
 
 	EasyMKT easyMKT;
@@ -10,7 +12,6 @@ public class SubscriptionFields implements Iterable<SubscriptionField> {
 
 	SubscriptionFields(EasyMKT easyMKT) {
 		this.easyMKT = easyMKT;
-		updateSubscriptions();
 	}
 	
 	private void updateSubscriptions() {
@@ -35,9 +36,24 @@ public class SubscriptionFields implements Iterable<SubscriptionField> {
 	}
 
 	SubscriptionField createSubscriptionField(String fieldName) {
+		Log.LogMessage(LogLevels.DETAILED, "Adding new subscription field: " + fieldName);
 		SubscriptionField newField = new SubscriptionField(this,fieldName);
 		subscriptionFields.add(newField);
+		updateSubscriptions();
+		Log.LogMessage(LogLevels.DETAILED, "Added new subscription field: " + newField.getName());
 		return newField;
+	}
+
+	public String getFieldList() {
+		
+		String list="";
+		
+		for(SubscriptionField f: subscriptionFields) {
+			list = list + f.getName() + ",";
+		}
+		
+		if(list.length()>0) list = list.substring(0, list.length()-1);
+		return list;
 	}
 
 }

@@ -1,6 +1,7 @@
 package com.bloomberg.mktdata.samples;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 
 import com.bloomberg.mktdata.samples.Log.LogLevels;
@@ -12,24 +13,30 @@ public class Fields implements Iterable<Field> {
 	private ArrayList<Field> fields = new ArrayList<Field>();
 	
 	Security security;
-	
-	private ArrayList<FieldChange> fieldChanges;
+	ArrayList<FieldChange> fieldChanges;
 	
 	Fields(Security security) {
 		this.security = security;
+		loadFields();
+	}
+	
+	private void loadFields() {
+		for(SubscriptionField sf: security.getSecurities().easyMKT.fields) {
+			Field newField = new Field(this,sf.getName(),"");
+			this.fields.add(newField);
+		}
 	}
 	
 	void populateFields(Message message) {
 
 		Log.LogMessage(LogLevels.BASIC, "Populate fields");
+		Log.LogMessage(LogLevels.BASIC, "Source: " + message.toString());
 		
 		CurrentToOldValues();
 		
 		int fieldCount = message.numElements();
 		
 		Element e = message.asElement();
-		
-		fieldChanges = new ArrayList<FieldChange>();
 		
 		for(int i=0; i<fieldCount; i++) {
 
@@ -42,11 +49,22 @@ public class Fields implements Iterable<Field> {
 			if(fd==null) fd = new Field(this);
 				
 			fd.setName(fieldName);
-			fd.setCurrentValue(f.getValueAsString()); 
 			
-			FieldChange fc = fd.getFieldChanged();
+			if(!f.isNull()) fd.setCurrentValue(f.getValueAsString()); 
+			else fd.setCurrentValue("");
+			
+			Log.LogMessage(LogLevels.DETAILED, "Setting field: " + fd.name() + "\tvalue: " + fd.value());
+		}
+		
+		fieldChanges = new ArrayList<FieldChange>();
+
+		for(Field f: fields) {
+		
+			FieldChange fc = f.getFieldChanged();
+			
 			if(fc!=null) {
 				fieldChanges.add(fc);
+				f.sendNotifications(new ArrayList<FieldChange>(Arrays.asList(fc)));
 			}
 		}
 	}

@@ -20,6 +20,9 @@
 
 package com.bloomberg.mktdata.samples;
 
+import java.io.IOException;
+import java.util.concurrent.ConcurrentHashMap;
+
 import com.bloomberg.mktdata.samples.Log.LogLevels;
 import com.bloomberglp.blpapi.CorrelationID;
 import com.bloomberglp.blpapi.Event;
@@ -30,6 +33,8 @@ import com.bloomberglp.blpapi.Name;
 import com.bloomberglp.blpapi.Service;
 import com.bloomberglp.blpapi.Session;
 import com.bloomberglp.blpapi.SessionOptions;
+import com.bloomberglp.blpapi.Subscription;
+import com.bloomberglp.blpapi.SubscriptionList;
 
 public class EasyMKT {
 	
@@ -62,7 +67,11 @@ public class EasyMKT {
 	Session session;
 	Service service;
 	
-	private boolean ready=false;
+	SubscriptionList subscriptionList;
+	
+	ConcurrentHashMap<CorrelationID, MessageHandler> messageHandlers = new ConcurrentHashMap<CorrelationID, MessageHandler>();
+
+	private volatile boolean ready=false;
 	
 	private static final String MKTDATA_SERVICE = "//blp/mktdata";
 	
@@ -81,20 +90,21 @@ public class EasyMKT {
 	private void initialise() {
 
 		fields = new SubscriptionFields(this);
+		securities = new Securities(this);
 		
     	SessionOptions sessionOptions = new SessionOptions();
         sessionOptions.setServerHost(this.host);
         sessionOptions.setServerPort(this.port);
 
-        Session session = new Session(sessionOptions, new EMSXEventHandler(this));
+        this.session = new Session(sessionOptions, new EMSXEventHandler(this));
         
         try {
-			session.startAsync();
+			this.session.startAsync();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
         
-        while(!ready);
+        while(!this.ready);
 		
 	}
 	
@@ -106,6 +116,12 @@ public class EasyMKT {
 	public Security addSecurity(String ticker) {
 		
 		return securities.createSecurity(ticker);
+	}
+	
+	public void start() {
+		for(Security s: securities) {
+			addSubscription(s);
+		}
 	}
 
 	class EMSXEventHandler implements EventHandler
@@ -202,6 +218,7 @@ public class EasyMKT {
                 	
                     easyMKT.service = session.getService(MKTDATA_SERVICE);
                 	
+        			Log.LogMessage(LogLevels.DETAILED, "Got service...ready...");
                     this.easyMKT.ready=true;
                     
                 } else if(msg.messageType().equals(SERVICE_OPEN_FAILURE)) {
@@ -238,8 +255,8 @@ public class EasyMKT {
         	while (msgIter.hasNext()) {
             
         		Message msg = msgIter.next();
-
         		// process the incoming market data event
+        		messageHandlers.get(msg.correlationID()).handleMessage(msg);
             }
         }
 
@@ -255,6 +272,33 @@ public class EasyMKT {
             }
         }
 
-    }	
+    }
+
+	public void addSubscription(Security security) {
+		
+        Log.LogMessage(LogLevels.DETAILED, "Adding subscription for security: " + security.getName());
+        
+        CorrelationID cID = new CorrelationID(security.getName());
+        
+        Subscription newSubscription = new Subscription(security.getName(),fields.getFieldList(),"",cID);
+
+        Log.LogMessage(LogLevels.DETAILED, "Topic string: " + newSubscription.subscriptionString());
+        
+        SubscriptionList newSubList = new SubscriptionList();
+
+        newSubList.add(newSubscription);
+        
+        messageHandlers.put(cID, security);
+        
+        try {
+            Log.LogMessage(LogLevels.DETAILED, "Subscribing...");
+			this.session.subscribe(newSubList);
+            Log.LogMessage(LogLevels.DETAILED, "Subscription request sent...");
+		} catch (IOException e) {
+            Log.LogMessage(LogLevels.BASIC, "Failed to subscribe: " + newSubList.toString());
+			e.printStackTrace();
+		}
+
+	}	
 
 }

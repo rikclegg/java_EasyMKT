@@ -3,20 +3,18 @@ package com.bloomberg.mktdata.samples;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-public class Securities implements Iterable<Security> {
+import com.bloomberg.mktdata.samples.Log.LogLevels;
+
+public class Securities implements Iterable<Security>, NotificationHandler {
 
 	EasyMKT easyMKT;
 	private ArrayList<Security> securities = new ArrayList<Security>();
+	ArrayList<NotificationHandler> notificationHandlers = new ArrayList<NotificationHandler>();
 
 	Securities(EasyMKT easyMKT) {
 		this.easyMKT = easyMKT;
-		updateSubscriptions();
 	}
 	
-	private void updateSubscriptions() {
-		// When a security is added, we create a new subscription for the current list of Subscription Fields.
-	}
-
 	@Override
 	public Iterator<Security> iterator() {
 		return securities.iterator();
@@ -34,9 +32,21 @@ public class Securities implements Iterable<Security> {
 	}
 
 	Security createSecurity(String ticker) {
+		Log.LogMessage(LogLevels.DETAILED, "Adding new security: " + ticker);
 		Security newSecurity = new Security(this,ticker);
 		securities.add(newSecurity);
+		Log.LogMessage(LogLevels.DETAILED, "Added new security: " + newSecurity.getName());
 		return newSecurity;
 	}
 
+	public void addNotificationHandler(NotificationHandler notificationHandler) {
+		notificationHandlers.add(notificationHandler);
+	}
+
+	@Override
+	public void processNotification(Notification notification) {
+		for(NotificationHandler nh: notificationHandlers) {
+			if(!notification.consume) nh.processNotification(notification);
+		}
+	}
 }

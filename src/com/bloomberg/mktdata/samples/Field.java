@@ -39,13 +39,7 @@ public class Field {
 	}
 	
 	void setCurrentValue(String value) {
-		
-		if(value!=this.current_value) {
-
-			this.old_value = this.current_value;
-			this.current_value = value;
-			this.notify(new Notification(NotificationCategory.MKTDATA, NotificationType.UPDATE, this.fields.security, new ArrayList<FieldChange>(Arrays.asList(this.getFieldChanged()))));
-		}
+		this.current_value = value;
 	}
 	
 	void CurrentToOld() {
@@ -69,12 +63,12 @@ public class Field {
 		notificationHandlers.add(notificationHandler);
 	}
 	
-	void notify(Notification notification) {
-		
-		for(NotificationHandler nh: notificationHandlers) {
-			if(!notification.consume) nh.processNotification(notification);
+	void sendNotifications(ArrayList<FieldChange> fcl) {
+		if(this.notificationHandlers.size()>0) {
+			Notification n = new Notification(NotificationCategory.MKTDATA, NotificationType.FIELD, this.fields.security, fcl);
+			for(NotificationHandler nh: notificationHandlers) {
+				if(!n.consume) nh.processNotification(n);
+			}
 		}
 	}
-
-
 }
