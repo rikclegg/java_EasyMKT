@@ -1,7 +1,6 @@
 package com.bloomberg.mktdata.samples;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import com.bloomberg.mktdata.samples.Notification.NotificationCategory;
 import com.bloomberg.mktdata.samples.Notification.NotificationType;
