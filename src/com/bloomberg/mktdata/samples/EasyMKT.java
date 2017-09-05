@@ -163,23 +163,23 @@ public class EasyMKT {
 
 		private void processAdminEvent(Event event, Session session) throws Exception 
 		{
-			Log.LogMessage(LogLevels.DETAILED, "Processing " + event.eventType().toString());
+			Log.LogMessage(LogLevels.BASIC, "Processing " + event.eventType().toString());
         	
 			MessageIterator msgIter = event.messageIterator();
             
 			while (msgIter.hasNext()) {
                 Message msg = msgIter.next();
                 if(msg.messageType().equals(SLOW_CONSUMER_WARNING)) {
-                	Log.LogMessage(LogLevels.DETAILED, "Warning: Entered Slow Consumer status");
+                	Log.LogMessage(LogLevels.BASIC, "Warning: Entered Slow Consumer status");
                 } else if(msg.messageType().equals(SLOW_CONSUMER_WARNING_CLEARED)) {
-                	Log.LogMessage(LogLevels.DETAILED, "Slow consumer status cleared");
+                	Log.LogMessage(LogLevels.BASIC, "Slow consumer status cleared");
                 }
             }
 		}
 
 		private void processSessionEvent(Event event, Session session) throws Exception {
 
-			Log.LogMessage(LogLevels.DETAILED, "Processing " + event.eventType().toString());
+			Log.LogMessage(LogLevels.BASIC, "Processing " + event.eventType().toString());
         	
 			MessageIterator msgIter = event.messageIterator();
             
@@ -188,23 +188,23 @@ public class EasyMKT {
 				Message msg = msgIter.next();
                 
 				if(msg.messageType().equals(SESSION_STARTED)) {
-					Log.LogMessage(LogLevels.DETAILED, "Session started...");
+					Log.LogMessage(LogLevels.BASIC, "Session started...");
                 	session.openServiceAsync(MKTDATA_SERVICE);
 				} else if(msg.messageType().equals(SESSION_STARTUP_FAILURE)) {
-					Log.LogMessage(LogLevels.DETAILED, "Error: Session startup failed");
+					Log.LogMessage(LogLevels.BASIC, "Error: Session startup failed");
                 } else if(msg.messageType().equals(SESSION_TERMINATED)) {
-                	Log.LogMessage(LogLevels.DETAILED, "Session has been terminated");
+                	Log.LogMessage(LogLevels.BASIC, "Session has been terminated");
                 } else if(msg.messageType().equals(SESSION_CONNECTION_UP)) {
-                	Log.LogMessage(LogLevels.DETAILED, "Session connection is up");
+                	Log.LogMessage(LogLevels.BASIC, "Session connection is up");
                 } else if(msg.messageType().equals(SESSION_CONNECTION_DOWN)) {
-                	Log.LogMessage(LogLevels.DETAILED, "Session connection is down");
+                	Log.LogMessage(LogLevels.BASIC, "Session connection is down");
                 }
             }
 		}
 
         private void processServiceEvent(Event event, Session session) {
 
-        	Log.LogMessage(LogLevels.DETAILED, "Processing " + event.eventType().toString());
+        	Log.LogMessage(LogLevels.BASIC, "Processing " + event.eventType().toString());
         	
         	MessageIterator msgIter = event.messageIterator();
             
@@ -214,33 +214,33 @@ public class EasyMKT {
                 
         		if(msg.messageType().equals(SERVICE_OPENED)) {
                 
-        			Log.LogMessage(LogLevels.DETAILED, "Service opened...");
+        			Log.LogMessage(LogLevels.BASIC, "Service opened...");
                 	
                     easyMKT.service = session.getService(MKTDATA_SERVICE);
                 	
-        			Log.LogMessage(LogLevels.DETAILED, "Got service...ready...");
+        			Log.LogMessage(LogLevels.BASIC, "Got service...ready...");
                     this.easyMKT.ready=true;
                     
                 } else if(msg.messageType().equals(SERVICE_OPEN_FAILURE)) {
-                	Log.LogMessage(LogLevels.DETAILED, "Error: Service failed to open");
+                	Log.LogMessage(LogLevels.BASIC, "Error: Service failed to open");
                 }
             }
 		}
 
 		private void processSubscriptionStatus(Event event, Session session) throws Exception 
 		{
-			Log.LogMessage(LogLevels.DETAILED, "Processing " + event.eventType().toString());
+			Log.LogMessage(LogLevels.BASIC, "Processing " + event.eventType().toString());
             
 			MessageIterator msgIter = event.messageIterator();
             
 			while (msgIter.hasNext()) {
                 Message msg = msgIter.next();
                 if(msg.messageType().equals(SUBSCRIPTION_STARTED)) {
-                	Log.LogMessage(LogLevels.DETAILED, "Subscription started successfully: " + msg.correlationID().toString());
+                	Log.LogMessage(LogLevels.BASIC, "Subscription started successfully: " + msg.correlationID().toString());
                 } else if(msg.messageType().equals(SUBSCRIPTION_FAILURE)) {
-                	Log.LogMessage(LogLevels.DETAILED, "Error: Subscription failed: "+ msg.correlationID().toString());
+                	Log.LogMessage(LogLevels.BASIC, "Error: Subscription failed: "+ msg.correlationID().toString());
                 } else if(msg.messageType().equals(SUBSCRIPTION_TERMINATED)) {
-                	Log.LogMessage(LogLevels.DETAILED, "Subscription terminated : " + msg.correlationID().toString());
+                	Log.LogMessage(LogLevels.BASIC, "Subscription terminated : " + msg.correlationID().toString());
                 }
             }
         }
@@ -262,13 +262,13 @@ public class EasyMKT {
 
         private void processMiscEvents(Event event, Session session) throws Exception 
         {
-			Log.LogMessage(LogLevels.DETAILED, "Processing " + event.eventType().toString());
+			Log.LogMessage(LogLevels.BASIC, "Processing " + event.eventType().toString());
 
 			MessageIterator msgIter = event.messageIterator();
             
 			while (msgIter.hasNext()) {
                 Message msg = msgIter.next();
-                Log.LogMessage(LogLevels.DETAILED, "MESSAGE: " + msg);
+                Log.LogMessage(LogLevels.BASIC, "MESSAGE: " + msg);
             }
         }
 

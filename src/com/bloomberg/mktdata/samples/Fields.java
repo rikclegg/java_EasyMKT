@@ -29,8 +29,8 @@ public class Fields implements Iterable<Field> {
 	
 	void populateFields(Message message) {
 
-		Log.LogMessage(LogLevels.BASIC, "Populate fields");
-		Log.LogMessage(LogLevels.BASIC, "Source: " + message.toString());
+		Log.LogMessage(LogLevels.DETAILED, "Populate fields");
+		Log.LogMessage(LogLevels.DETAILED, "Source: " + message.toString());
 		
 		CurrentToOldValues();
 		
